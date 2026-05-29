@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DYNO × Steuerberater — bAV Überblick</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --purple:#6500ff;--purple-dim:rgba(101,0,255,.15);--purple-bright:#7c1fff;
+  --orange:#ff5e2c;
+  --bg:#0b0b0d;--surface:#141418;--surface2:#1c1c26;
+  --text:#fff;--text-dim:rgba(255,255,255,.58);--text-muted:rgba(255,255,255,.32);
+  --border:rgba(255,255,255,.08);--insight-bg:rgba(255,255,255,.04);
+  --footer-bg:rgba(11,11,13,.88);--footer-border:rgba(255,255,255,.08);
+  --nav-btn-bg:rgba(255,255,255,.05);--dot-inactive:rgba(255,255,255,.18);
+  --green:#16a34a;--red:#ef4444;
+}
+html.light{
+  --bg:#fff;--surface:#f5f5f5;--surface2:#efefef;
+  --text:#111;--text-dim:#555;--text-muted:#888;
+  --border:#e0e0e0;--insight-bg:rgba(0,0,0,.03);
+  --footer-bg:rgba(255,255,255,.92);--footer-border:#e0e0e0;
+  --nav-btn-bg:rgba(0,0,0,.05);--dot-inactive:rgba(0,0,0,.15);
+}
+#theme-toggle{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:999;display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:20px;overflow:hidden;}
+.tt-opt{display:flex;align-items:center;gap:5px;padding:6px 14px;font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--text-muted);transition:all .25s;cursor:pointer;font-family:'Poppins',sans-serif;border:none;background:transparent;}
+.tt-opt.active{background:var(--purple);color:#fff;border-radius:20px;}
+.tt-opt svg{width:12px;height:12px;flex-shrink:0;}
+html.light .slide[data-bg="hero"]{background:radial-gradient(ellipse at 15% 55%,rgba(101,0,255,.06) 0%,transparent 55%),radial-gradient(ellipse at 85% 25%,rgba(255,94,44,.05) 0%,transparent 45%),#fff!important;}
+html.light .slide[data-bg="glow"]{background:radial-gradient(ellipse at 70% 25%,rgba(101,0,255,.06) 0%,transparent 50%),#fff!important;}
+html.light .slide[data-bg="end"]{background:radial-gradient(ellipse at 35% 65%,rgba(101,0,255,.06) 0%,transparent 50%),#fff!important;}
+html.light .dot-btn{background:var(--dot-inactive)!important;}
+html.light .dot-btn.active{background:var(--purple)!important;}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Poppins',sans-serif;color:var(--text);}
+#progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--purple);transition:width .5s ease;z-index:999;}
+.logo-area{position:fixed;top:16px;left:24px;z-index:999;}
+.logo-text{font-size:18px;font-weight:800;letter-spacing:.06em;color:var(--text);}
+.logo-text .accent{color:var(--orange);}
+#global-footer{position:fixed;bottom:0;left:0;right:0;height:34px;display:flex;align-items:center;justify-content:center;background:var(--footer-bg);backdrop-filter:blur(8px);border-top:1px solid var(--footer-border);z-index:998;}
+#global-footer span{font-size:10px;font-weight:500;color:var(--text-muted);letter-spacing:.7px;}
+#global-footer em{color:var(--text-muted);font-style:normal;margin:0 8px;opacity:.4;}
+#slide-counter{position:fixed;top:20px;right:24px;font-size:11px;color:var(--text-muted);letter-spacing:.5px;z-index:999;font-weight:500;}
+#nav-dots{position:fixed;bottom:42px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:999;}
+.dot-btn{width:7px;height:7px;border-radius:50%;background:var(--dot-inactive);border:none;cursor:pointer;transition:all .3s;padding:0;}
+.dot-btn.active{background:var(--purple);width:22px;border-radius:4px;}
+#nav-prev,#nav-next{position:fixed;top:50%;transform:translateY(-50%);z-index:998;background:var(--nav-btn-bg);border:1px solid var(--border);color:var(--text-muted);width:40px;height:40px;border-radius:50%;font-size:18px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;}
+#nav-prev{left:14px;}#nav-next{right:14px;}
+#nav-prev:hover,#nav-next:hover{background:rgba(101,0,255,.15);border-color:var(--purple);color:var(--purple);}
+#slides{position:fixed;inset:0;overflow:hidden;}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:52px 80px 52px;opacity:0;transform:translateY(26px);transition:opacity .5s cubic-bezier(.4,0,.2,1),transform .5s cubic-bezier(.4,0,.2,1);pointer-events:none;overflow-y:auto;}
+.slide::-webkit-scrollbar{width:3px;}
+.slide::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:2px;}
+.slide.active{opacity:1;transform:translateY(0);pointer-events:all;}
+.slide.prev{opacity:0;transform:translateY(-26px);}
+.slide-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:12px;}
+.section-title{font-size:clamp(22px,3vw,38px);font-weight:800;letter-spacing:-0.025em;line-height:1.08;margin-bottom:20px;}
+.section-title em{font-style:italic;color:var(--purple);}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;background:var(--purple-dim);color:var(--purple);border:1px solid rgba(101,0,255,.25);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:28px;width:100%;}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;}
+.four-col{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;width:100%;}
+@media(min-width:1100px){.four-col{grid-template-columns:repeat(4,1fr);}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;}
+.insight-bar{display:flex;align-items:center;gap:13px;background:var(--insight-bg);border:1px solid var(--border);border-radius:10px;padding:12px 18px;margin-top:14px;width:100%;}
+.insight-bar .icon{font-size:18px;}
+.insight-bar p{font-size:13px;color:var(--text-dim);line-height:1.55;}
+.insight-bar strong{color:var(--text);}
+.slide.active [data-a]{animation:fadeUp .5s ease both;}
+.slide.active [data-a="1"]{animation-delay:.06s;}
+.slide.active [data-a="2"]{animation-delay:.18s;}
+.slide.active [data-a="3"]{animation-delay:.32s;}
+.slide.active [data-a="4"]{animation-delay:.46s;}
+.slide.active [data-a="5"]{animation-delay:.6s;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.kpi-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;}
+.kpi-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:13px 16px;}
+.kpi-box .kv{font-size:22px;font-weight:800;letter-spacing:-0.03em;line-height:1;}
+.kpi-box .kl{font-size:10px;color:var(--text-muted);margin-top:4px;line-height:1.4;}
+.press-row{display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap;opacity:.4;margin-top:16px;}
+.press-row span{font-size:12px;font-weight:600;letter-spacing:.04em;color:var(--text-muted);}
+.benefit-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;}
+.benefit-icon{width:40px;height:40px;border-radius:10px;background:var(--purple-dim);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px;}
+.benefit-card h4{font-size:14px;font-weight:700;margin-bottom:6px;letter-spacing:-0.01em;}
+.benefit-card p{font-size:12px;color:var(--text-dim);line-height:1.6;}
+.spec-row{display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border);gap:20px;}
+.spec-row:last-child{border-bottom:none;}
+.spec-label{font-size:12px;font-weight:600;color:var(--text-muted);letter-spacing:.03em;text-transform:uppercase;flex-shrink:0;width:160px;}
+.spec-value{font-size:13px;color:var(--text);line-height:1.55;flex:1;}
+.spec-value strong{color:var(--purple);font-weight:700;}
+.docs-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:800px;}
+.doc-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px;}
+.doc-icon{width:32px;height:32px;border-radius:8px;background:var(--purple-dim);display:flex;align-items:center;justify-content:center;color:var(--purple);flex-shrink:0;font-size:14px;font-weight:700;}
+.doc-item h5{font-size:13px;font-weight:700;margin-bottom:2px;}
+.doc-item p{font-size:11px;color:var(--text-muted);line-height:1.4;}
+.target-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.target-pill{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;color:var(--text-dim);}
+.target-pill strong{color:var(--purple);margin-right:4px;}
+.flow-step{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:flex-start;gap:14px;}
+.flow-num{width:30px;height:30px;border-radius:8px;background:var(--purple);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0;}
+.flow-step h5{font-size:14px;font-weight:700;margin-bottom:3px;letter-spacing:-0.01em;}
+.flow-step p{font-size:12px;color:var(--text-dim);line-height:1.5;}
+.flow-step .badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;background:var(--purple-dim);color:var(--purple);margin-top:6px;}
+.faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;}
+.faq-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;}
+.faq-item h5{font-size:13px;font-weight:700;margin-bottom:6px;letter-spacing:-0.01em;display:flex;align-items:flex-start;gap:8px;}
+.faq-item h5 span{color:var(--purple);font-weight:800;flex-shrink:0;}
+.faq-item p{font-size:12px;color:var(--text-dim);line-height:1.55;padding-left:20px;}
+.faq-item p strong{color:var(--text);}
+@media(max-width:900px){.slide{padding:44px 24px 52px;}.two-col,.three-col,.four-col,.docs-grid,.faq-grid{grid-template-columns:1fr;}.kpi-strip{grid-template-columns:1fr 1fr;}.spec-row{flex-direction:column;gap:4px;}.spec-label{width:auto;}}
+</style>
+</head>
+<body>
+<div id="theme-toggle">
+  <button class="tt-opt" id="tt-dark" onclick="setTheme('dark')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>Dark</button>
+  <button class="tt-opt active" id="tt-light" onclick="setTheme('light')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>Light</button>
+</div>
+<div class="logo-area"><span class="logo-text">DYNO<span class="accent">✦</span></span></div>
+<div id="progress-bar"></div>
+<div id="slide-counter"></div>
+<div id="global-footer"><span>bAV Überblick für Steuerberater<em>·</em>DYNO GmbH<em>·</em>confidential © 2026</span></div>
+<button id="nav-prev" onclick="prevSlide()">‹</button>
+<button id="nav-next" onclick="nextSlide()">›</button>
+<div id="nav-dots"></div>
+<div id="slides">
+
+<!-- ══ 1: TITLE ══ -->
+<div class="slide active" data-bg="hero" style="background:radial-gradient(ellipse at 15% 55%,rgba(101,0,255,.18) 0%,transparent 55%),radial-gradient(ellipse at 85% 25%,rgba(255,94,44,.1) 0%,transparent 45%),var(--bg);">
+  <div style="text-align:center;max-width:900px;">
+    <div style="display:flex;align-items:center;justify-content:center;gap:36px;margin-bottom:40px;flex-wrap:wrap;" data-a="1">
+      <span class="logo-text" style="font-size:28px;">DYNO<span class="accent">✦</span></span>
+      <div style="width:2px;height:44px;background:var(--border);"></div>
+      <span style="font-size:20px;font-weight:700;letter-spacing:.02em;">Für Steuerberater:innen</span>
+    </div>
+    <div class="section-title" style="font-size:clamp(34px,5.5vw,62px);margin-bottom:14px;" data-a="2">Betriebliche Altersvorsorge<br><em>einfach erklärt.</em></div>
+    <p style="font-size:15px;color:var(--text-dim);max-width:640px;margin:20px auto 0;line-height:1.6;" data-a="3">Ein kurzer Überblick für Ihr Lohn- &amp; Steuerbüro: Wer wir sind, wie die bAV aufgebaut ist und was Sie konkret von uns erhalten — mit den wichtigsten Fragen auf einen Blick.</p>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:28px;" data-a="4">Confidential © 2026</div>
+  </div>
+</div>
+
+<!-- ══ 2: WAS MACHT DYNO? ══ -->
+<div class="slide" data-bg="glow" style="background:radial-gradient(ellipse at 70% 25%,rgba(101,0,255,.12) 0%,transparent 50%),var(--bg);">
+  <div style="width:100%;max-width:1000px;">
+    <div class="slide-label" data-a="1">#1 · Was macht DYNO?</div>
+    <div class="section-title" data-a="2">Digitale, <em>provisionsfreie</em> bAV<br>für Unternehmen jeder Größe.</div>
+    <p style="font-size:14px;color:var(--text-dim);max-width:720px;margin-bottom:16px;line-height:1.65;" data-a="3">DYNO ist eine digitale Lösung für die betriebliche Altersvorsorge — für <strong style="color:var(--text);">Arbeitnehmende, Geschäftsführer:innen und Gesellschafter-Geschäftsführer:innen</strong>. Wir arbeiten ausschließlich mit <strong style="color:var(--text);">Direktversicherungen nach § 3 Nr. 63 EStG</strong> — ein rechtssicheres, steuerlich anerkanntes Konstrukt.</p>
+    <div class="target-pills" data-a="3">
+      <div class="target-pill"><strong>✓</strong>Arbeitnehmende</div>
+      <div class="target-pill"><strong>✓</strong>Geschäftsführer</div>
+      <div class="target-pill"><strong>✓</strong>Gesellschafter-GF</div>
+      <div class="target-pill"><strong>✓</strong>Alle Unternehmensgrößen</div>
+    </div>
+    <div class="insight-bar" data-a="4"><div class="icon">💡</div><p><strong>Nettotarife = vollständig provisionsfrei.</strong> Der gesamte Beitrag fließt in die Altersvorsorge — bei voller Transparenz über alle Kosten.</p></div>
+    <div class="kpi-strip" data-a="5">
+      <div class="kpi-box"><div class="kv">600+</div><div class="kl">Unternehmen</div></div>
+      <div class="kpi-box"><div class="kv" style="color:var(--purple);">20.000+</div><div class="kl">Arbeitnehmende</div></div>
+      <div class="kpi-box"><div class="kv" style="color:var(--orange);font-size:16px;">⭐ 4.9 / 5</div><div class="kl">OMR Reviews · Top Rated 2025</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 3: VERTRAGSFORM ══ -->
+<div class="slide">
+  <div style="width:100%;max-width:1000px;">
+    <div class="slide-label" data-a="1">#2 · Welche Vertragsform?</div>
+    <div class="section-title" data-a="2">Direktversicherung <em>&amp; Unterstützungskasse</em></div>
+    <p style="font-size:13px;color:var(--text-dim);max-width:680px;margin:-8px 0 4px;line-height:1.6;" data-a="2">Zwei rechtssichere Durchführungswege — je nach Bedarf des Mandanten.</p>
+    <div class="card" data-a="3" style="margin-top:10px;">
+      <div class="spec-row">
+        <div class="spec-label">Durchführungsweg</div>
+        <div class="spec-value"><strong>Direktversicherung</strong> (Rentenversicherung) — klassisches Modell, voll steuerrechtlich abgesichert. Alternativ auch als <strong>Unterstützungskasse</strong> (rückgedeckt) wählbar.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-label">Leistungsform</div>
+        <div class="spec-value">Lebenslange Rente <strong>+ Kapitaloption</strong> (je nach Tarif)</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-label">Garantieniveau</div>
+        <div class="spec-value">Optional <strong>bis 0 %</strong> wählbar — für alle, die Wert auf maximale Rendite legen</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-label">Tarifart</div>
+        <div class="spec-value"><strong>Nettotarif</strong> — keine Abschluss- oder Vertriebsprovisionen</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-label">Option Unterstützungskasse</div>
+        <div class="spec-value">Auf Wunsch <strong>rückgedeckte Unterstützungskasse</strong> als zweiter Durchführungsweg — z. B. für höhere Dotierungen oberhalb der § 3 Nr. 63-Grenze. <strong>Keine</strong> Pensionszusage, <strong>kein</strong> Pensionsfonds. Einfach, klar, steuerlich unkompliziert.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 4: WARUM DYNO ══ -->
+<div class="slide">
+  <div style="width:100%;max-width:1100px;">
+    <div class="slide-label" data-a="1">#3 · Warum setzen Unternehmen DYNO ein?</div>
+    <div class="section-title" data-a="2" style="margin-bottom:24px;">Vier Gründe, die <em>überzeugen.</em></div>
+    <div class="four-col" data-a="3">
+      <div class="benefit-card">
+        <div class="benefit-icon">💰</div>
+        <h4>Steuerlich optimal</h4>
+        <p>Beiträge bis zu <strong style="color:var(--text);">676 € mtl. (2026)</strong> bzw. höhere Einmalzahlungen steuer- & sozialabgabenfrei möglich.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">✨</div>
+        <h4>Provisionsfreie Nettotarife</h4>
+        <p>Keine Abschluss- oder Vertriebskosten — dadurch <strong style="color:var(--text);">signifikant höhere Kapitalwirkung</strong>.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">🔍</div>
+        <h4>Maximale Transparenz</h4>
+        <p>Volle Einsicht in <strong style="color:var(--text);">ETF-Auswahl, Kostenstruktur und Vertragswerte</strong> für Mandant und Berater.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">💻</div>
+        <h4>Digitale Verwaltung</h4>
+        <p>Änderungen, Erhöhungen, Abfragen oder Dokumente laufen <strong style="color:var(--text);">ohne Aufwand</strong> über die DYNO-Plattform.</p>
+      </div>
+    </div>
+    <div class="insight-bar" data-a="4" style="margin-top:18px;"><div class="icon">📈</div><p><strong>Konkret:</strong> Durch den Wegfall der Abschlusskosten (oft 2,5 % der Beitragssumme) bleibt das gesamte Kapital investiert — über 30 Jahre ergibt das je nach Beitragshöhe fünfstellige Mehrwerte.</p></div>
+  </div>
+</div>
+
+<!-- ══ 5: BEITRAGSGRENZEN 2026 ══ -->
+<div class="slide" data-bg="glow" style="background:radial-gradient(ellipse at 70% 25%,rgba(101,0,255,.12) 0%,transparent 50%),var(--bg);">
+  <div style="width:100%;max-width:1000px;">
+    <div class="slide-label" data-a="1">Steuerliche Rahmenbedingungen 2026</div>
+    <div class="section-title" data-a="2">§ 3 Nr. 63 EStG <em>im Detail.</em></div>
+    <div class="two-col" data-a="3" style="margin-top:10px;">
+      <div class="card">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">Steuerfrei (8 % BBG-West)</div>
+        <div style="font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-0.03em;color:var(--purple);line-height:1;">8.112 €</div>
+        <p style="font-size:12px;color:var(--text-dim);margin-top:8px;line-height:1.55;">p.a. bzw. <strong style="color:var(--text);">676 €/Monat</strong> einkommensteuerfrei nach § 3 Nr. 63 EStG.</p>
+      </div>
+      <div class="card">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">Sozialabgabenfrei (4 % BBG-West)</div>
+        <div style="font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-0.03em;color:var(--orange);line-height:1;">4.056 €</div>
+        <p style="font-size:12px;color:var(--text-dim);margin-top:8px;line-height:1.55;">p.a. bzw. <strong style="color:var(--text);">338 €/Monat</strong> zusätzlich sozialversicherungsfrei (KV, PV, RV, AV).</p>
+      </div>
+    </div>
+    <div class="insight-bar" data-a="4"><div class="icon">ℹ️</div><p><strong>BBG RV 2026:</strong> 101.400 € p.a. (West). Für GGF ohne SV-Pflicht ist nur die 8 %-Grenze relevant. Bestehende §40b-Altverträge werden nach BMF-Schreiben (Rn. 30) auf den § 3 Nr. 63-Rahmen angerechnet.</p></div>
+  </div>
+</div>
+
+<!-- ══ 6: ABLAUF FÜR LOHN- & STEUERBÜRO ══ -->
+<div class="slide">
+  <div style="width:100%;max-width:1000px;">
+    <div class="slide-label" data-a="1">#4 · So einfach ist es für Ihr Lohn- & Steuerbüro</div>
+    <div class="section-title" data-a="2">Komplette Doku — <em>ohne Zusatzaufwand.</em></div>
+    <p style="font-size:14px;color:var(--text-dim);max-width:720px;margin-bottom:20px;line-height:1.6;" data-a="3">DYNO macht die Lohnabrechnung der bAV einfach und effizient. Alle Unterlagen werden rechtssicher aufbereitet — für die Lohnbuchhaltung Ihres Mandanten bedeutet das: <strong style="color:var(--text);">einloggen, Lohnliste herunterladen, fertig.</strong></p>
+    <div class="four-col" data-a="4">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div>
+          <h5>Monatliche Lohnliste — proaktiv</h5>
+          <p>Immer in der ersten Woche des Monats steht Ihnen die Lohnliste mit allen lohnrelevanten Informationen zum Download bereit.</p>
+          <span class="badge">monatlich aktuell</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div>
+          <h5>Nur wenn sich etwas ändert</h5>
+          <p>Bei lohnrelevanten Änderungen werden Sie direkt informiert. Liegen keine Änderungen vor, kommt auch keine Benachrichtigung.</p>
+          <span class="badge">übersichtlich & vollständig</span>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div>
+          <h5>Optional: Steuerberater-Zugang</h5>
+          <p>Über den Bereich „Benutzende" gibt der AG Ihrer Kanzlei Zugang. Alle lohnrelevanten Daten und Dokumente sind dort zentral und strukturiert hinterlegt.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div>
+          <h5>Auch für AG & Mitarbeitende</h5>
+          <p>Über den Mitarbeitenden-Bereich sind alle relevanten Daten und Dokumente zusätzlich für Arbeitgeber und Mitarbeitende zugänglich.</p>
+        </div>
+      </div>
+    </div>
+    <div class="insight-bar" data-a="5"><div class="icon">✅</div><p><strong>Ergebnis:</strong> Ihre Kanzlei erhält eine komplette, rechtssichere Dokumentation und monatlich genau die Werte, die in die Lohnabrechnung müssen. Einführung, Verwaltung und Bestandsbetreuung laufen digital — ohne Mehraufwand für Sie.</p></div>
+  </div>
+</div>
+
+<!-- ══ 7: DIGITAL ODER PERSÖNLICH ══ -->
+<div class="slide">
+  <div style="width:100%;max-width:1000px;text-align:center;">
+    <div class="slide-label" data-a="1">Beratung & Betreuung</div>
+    <div class="section-title" data-a="2">Digital oder persönlich — <em>wie es passt.</em></div>
+    <p style="font-size:14px;color:var(--text-dim);max-width:600px;margin:0 auto 28px;line-height:1.65;" data-a="3">Alles digital — mit persönlicher Beratung auf Knopfdruck. Für Sie und Ihre Mandanten.</p>
+    <div class="three-col" data-a="4" style="max-width:900px;margin:0 auto;">
+      <div class="benefit-card" style="text-align:left;">
+        <div class="benefit-icon">🖥️</div>
+        <h4>Digitale Plattform</h4>
+        <p>Verwaltung, Kommunikation und Vertragsänderungen komplett digital — 24/7 verfügbar.</p>
+      </div>
+      <div class="benefit-card" style="text-align:left;">
+        <div class="benefit-icon">👥</div>
+        <h4>Persönliche Beratung</h4>
+        <p>Direkter Kontakt zu DYNO-Spezialisten per Video-Call oder Telefon — auf Knopfdruck.</p>
+      </div>
+      <div class="benefit-card" style="text-align:left;">
+        <div class="benefit-icon">🤝</div>
+        <h4>Steuerberater-Channel</h4>
+        <p>Direkter Draht für Ihre fachlichen Rückfragen — kompetent und verbindlich.</p>
+      </div>
+    </div>
+    <div class="press-row" data-a="5" style="margin-top:28px;">
+      <span style="text-transform:uppercase;letter-spacing:.1em;font-size:10px;">Bekannt aus</span>
+      <span>Gründerszene</span><span>Business Insider</span><span>Bild</span><span>Handelsblatt</span><span>Personalmagazin</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 8: FAQ ══ -->
+<div class="slide" data-bg="glow" style="background:radial-gradient(ellipse at 70% 25%,rgba(101,0,255,.12) 0%,transparent 50%),var(--bg);">
+  <div style="width:100%;max-width:1080px;">
+    <div class="slide-label" data-a="1">Häufige Fragen aus der Kanzlei</div>
+    <div class="section-title" data-a="2" style="margin-bottom:20px;">Kurz beantwortet — <em>FAQ.</em></div>
+    <div class="faq-grid" data-a="3">
+      <div class="faq-item">
+        <h5><span>?</span>Entsteht für uns als Kanzlei Mehraufwand?</h5>
+        <p>Nein. Sie loggen sich ein und laden die fertige, monatliche Lohnliste herunter — keine eigene Recherche. Die Werte gehen direkt in die Entgeltabrechnung.</p>
+      </div>
+      <div class="faq-item">
+        <h5><span>?</span>Wie sind die Beiträge zu verbuchen?</h5>
+        <p>Entgeltumwandlung nach <strong>§ 3 Nr. 63 EStG</strong>: bis 8 % BBG steuerfrei, bis 4 % BBG zusätzlich sozialabgabenfrei. AG-Zuschuss von 15 % ist gesetzlich verpflichtend.</p>
+      </div>
+      <div class="faq-item">
+        <h5><span>?</span>Welcher Durchführungsweg?</h5>
+        <p><strong>Direktversicherung</strong> (Standard) oder auf Wunsch <strong>rückgedeckte Unterstützungskasse</strong>. Keine Pensionszusage, kein Pensionsfonds — bilanzneutral.</p>
+      </div>
+      <div class="faq-item">
+        <h5><span>?</span>Was, wenn sich nichts ändert?</h5>
+        <p>Dann erhalten Sie keine Benachrichtigung. Eine Meldung kommt nur, wenn es lohnrelevante Änderungen gibt — kein unnötiges Postfach-Rauschen.</p>
+      </div>
+      <div class="faq-item">
+        <h5><span>?</span>Wer haftet für die Beratung?</h5>
+        <p>DYNO übernimmt Beratung, Vermittlung und Verwaltung als Makler. Ihre Kanzlei bleibt bei der reinen Lohnabrechnung — keine bAV-Beratungshaftung bei Ihnen.</p>
+      </div>
+      <div class="faq-item">
+        <h5><span>?</span>Wie kommen wir an die Daten?</h5>
+        <p>Über Ihren Steuerberater-Zugang im Bereich „Benutzende". Dort laden Sie die monatliche Lohnliste herunter — alle Daten und Dokumente zentral und strukturiert.</p>
+      </div>
+    </div>
+    <div class="insight-bar" data-a="4"><div class="icon">💬</div><p><strong>Weitere Fragen?</strong> Über den Steuerberater-Channel haben Sie einen direkten Draht zu uns — fachlich und verbindlich.</p></div>
+  </div>
+</div>
+
+<!-- ══ 9: KONTAKT ══ -->
+<div class="slide" data-bg="end" style="background:radial-gradient(ellipse at 35% 65%,rgba(101,0,255,.18) 0%,transparent 50%),var(--bg);">
+  <div style="text-align:center;max-width:640px;" data-a="1">
+    <div style="font-size:18px;font-weight:800;letter-spacing:.06em;margin-bottom:28px;">DYNO<span style="color:var(--orange);">✦</span> <span style="font-weight:400;color:var(--text-muted);">RETTET DIE RENTE</span></div>
+    <div style="font-size:clamp(40px,7vw,72px);font-weight:800;letter-spacing:-0.05em;line-height:1;" data-a="2">Lassen Sie uns<br>sprechen.</div>
+    <p style="font-size:14px;color:var(--text-dim);margin-top:24px;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.6;" data-a="3">Bei Fragen gerne melden — wir stimmen uns unkompliziert mit Ihnen ab, fachlich und auf Augenhöhe.</p>
+    <div style="margin-top:32px;" data-a="4">
+      <h4 style="font-size:16px;font-weight:700;">Luis Weber</h4>
+      <p style="font-size:13px;color:var(--text-muted);margin-top:2px;">CEO & Co-Founder · DYNO GmbH</p>
+      <p style="font-size:14px;margin-top:12px;"><a href="mailto:support@heydyno.de" style="color:var(--purple);text-decoration:none;font-weight:600;">support@heydyno.de</a></p>
+      <p style="font-size:14px;"><a href="https://heydyno.de" target="_blank" style="color:var(--text-dim);text-decoration:none;">heydyno.de</a></p>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const TOTAL=9;
+let current=0;
+const dotsEl=document.getElementById('nav-dots');
+for(let i=0;i<TOTAL;i++){const b=document.createElement('button');b.className='dot-btn'+(i===0?' active':'');b.onclick=()=>goTo(i);dotsEl.appendChild(b);}
+function goTo(n){
+  const slides=document.querySelectorAll('.slide');
+  slides[current].classList.remove('active');
+  slides[current].classList.add('prev');
+  const prev=current;
+  setTimeout(()=>slides[prev].classList.remove('prev'),600);
+  current=Math.max(0,Math.min(TOTAL-1,n));
+  slides[current].classList.add('active');
+  updateUI();
+}
+function nextSlide(){if(current<TOTAL-1) goTo(current+1);}
+function prevSlide(){if(current>0) goTo(current-1);}
+function updateUI(){
+  document.getElementById('progress-bar').style.width=((current+1)/TOTAL*100)+'%';
+  document.getElementById('slide-counter').textContent=String(current+1).padStart(2,'0')+' / '+String(TOTAL).padStart(2,'0');
+  document.querySelectorAll('.dot-btn').forEach((d,i)=>d.classList.toggle('active',i===current));
+}
+document.addEventListener('keydown',e=>{if(['ArrowRight','ArrowDown',' '].includes(e.key)){e.preventDefault();nextSlide();}if(['ArrowLeft','ArrowUp'].includes(e.key)){e.preventDefault();prevSlide();}});
+let tx=0;
+document.addEventListener('touchstart',e=>tx=e.touches[0].clientX);
+document.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){dx<0?nextSlide():prevSlide();}});
+function setTheme(t){
+  const isDark=(t==='dark');
+  document.documentElement.classList.toggle('light',!isDark);
+  document.getElementById('tt-dark').classList.toggle('active',isDark);
+  document.getElementById('tt-light').classList.toggle('active',!isDark);
+}
+setTheme('light');
+updateUI();
+</script>
+</body>
+</html>
